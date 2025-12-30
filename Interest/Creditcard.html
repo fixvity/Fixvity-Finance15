@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Credit Card Payoff Calculator</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root{
+  --bg:#f5f7fb;
+  --card:#ffffff;
+  --accent:#2563eb;
+  --success:#16a34a;
+  --danger:#dc2626;
+  --muted:#6b7280;
+  --radius:14px;
+  --shadow:0 10px 30px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,system-ui,Arial;
+  background:var(--bg);
+  color:#111;
+}
+h1{
+  text-align:center;
+  color:var(--accent);
+  margin:24px 0;
+}
+.container{
+  max-width:1200px;
+  margin:auto;
+  padding:16px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:380px 1fr;
+  gap:24px;
+}
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:24px;
+}
+.section{
+  margin-bottom:22px;
+  padding-bottom:18px;
+  border-bottom:1px solid #eef2f7;
+}
+.section:last-child{border:none}
+.section h3{
+  margin:0 0 14px;
+  color:var(--accent);
+  font-size:16px;
+}
+label{
+  font-size:13px;
+  color:var(--muted);
+  display:block;
+  margin-bottom:6px;
+}
+input,select{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1.8px solid #e5e7eb;
+  margin-bottom:14px;
+  font-size:14px;
+}
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  font-weight:600;
+  cursor:pointer;
+}
+.primary{background:var(--accent);color:#fff}
+.secondary{background:#eef2ff;color:#111;margin-top:10px}
+
+.results{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+  margin-bottom:22px;
+}
+.result-box{
+  background:#f8fafc;
+  border-radius:12px;
+  padding:16px;
+  text-align:center;
+}
+.result-box b{
+  font-size:20px;
+  display:block;
+}
+.result-box small{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.chart-wrap{
+  height:300px;
+  margin-top:12px;
+}
+
+@media(max-width:900px){
+  .grid{grid-template-columns:1fr}
+  .results{grid-template-columns:repeat(2,1fr)}
+  .card{padding:18px}
+}
+</style>
+</head>
+
+<body>
+<h1>💳 Credit Card Payoff Calculator</h1>
+
+<div class="container">
+<div class="grid">
+
+<!-- INPUT PANEL -->
+<div class="card">
+
+<div class="section">
+<h3>Card Details</h3>
+<label>Currency</label>
+<select>
+  <option>$ USD</option>
+  <option>€ EUR</option>
+  <option>£ GBP</option>
+  <option>₹ INR</option>
+</select>
+
+<label>Current Balance</label>
+<input placeholder="e.g. 5000">
+
+<label>Annual Interest Rate (APR %)</label>
+<input placeholder="e.g. 18.9">
+</div>
+
+<div class="section">
+<h3>Payment Setup</h3>
+<label>Payment Type</label>
+<select>
+  <option>Fixed Monthly Payment</option>
+  <option>Minimum Payment Only</option>
+  <option>Target Payoff Time</option>
+</select>
+
+<label>Monthly Payment Amount</label>
+<input placeholder="e.g. 200">
+
+<label>Minimum Payment (%)</label>
+<input placeholder="e.g. 2">
+</div>
+
+<div class="section">
+<h3>Extra Options</h3>
+<label>Extra Monthly Payment</label>
+<input placeholder="e.g. 50">
+
+<label>One-Time Lump Sum Payment</label>
+<input placeholder="e.g. 1000">
+
+<label>Balance Transfer APR (%)</label>
+<input placeholder="Optional">
+</div>
+
+<button class="primary">Calculate Payoff</button>
+<button class="secondary">Reset</button>
+</div>
+
+<!-- OUTPUT PANEL -->
+<div class="card">
+
+<div class="results">
+  <div class="result-box">
+    <b>36</b>
+    <small>Months to Pay Off</small>
+  </div>
+  <div class="result-box">
+    <b>$1,420</b>
+    <small>Total Interest Paid</small>
+  </div>
+  <div class="result-box">
+    <b>$6,420</b>
+    <small>Total Amount Paid</small>
+  </div>
+  <div class="result-box">
+    <b>$890</b>
+    <small>Interest Saved</small>
+  </div>
+</div>
+
+<div class="chart-wrap">
+<canvas id="chart"></canvas>
+</div>
+
+</div>
+
+</div>
+</div>
+
+<script>
+new Chart(document.getElementById("chart"),{
+ type:"line",
+ data:{
+  labels:["Month 1","Month 6","Month 12","Month 18","Month 24","Month 30","Month 36"],
+  datasets:[
+   {
+    label:"Remaining Balance",
+    data:[5000,4200,3300,2400,1600,800,0],
+    borderColor:"#2563eb",
+    tension:.35
+   },
+   {
+    label:"Interest Paid",
+    data:[0,300,600,900,1200,1350,1420],
+    borderColor:"#dc2626",
+    tension:.35
+   }
+  ]
+ }
+});
+</script>
+</body>
+</html>
