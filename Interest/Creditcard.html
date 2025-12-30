@@ -10,12 +10,12 @@
 :root{
   --bg:#f5f7fb;
   --card:#ffffff;
-  --accent:#2563eb;
-  --success:#16a34a;
-  --danger:#dc2626;
+  --accent:#2f6ce5;
+  --success:#10b981;
+  --danger:#ef4444;
   --muted:#6b7280;
   --radius:14px;
-  --shadow:0 12px 32px rgba(0,0,0,.08);
+  --shadow:0 10px 30px rgba(0,0,0,.08);
 }
 *{box-sizing:border-box}
 body{
@@ -30,7 +30,7 @@ h1{
   margin:24px 0;
 }
 .container{
-  max-width:1300px;
+  max-width:1200px;
   margin:auto;
   padding:16px;
 }
@@ -43,18 +43,17 @@ h1{
   background:var(--card);
   border-radius:var(--radius);
   box-shadow:var(--shadow);
-  padding:22px;
+  padding:24px;
 }
 .section{
-  margin-bottom:18px;
-  padding-bottom:14px;
+  margin-bottom:20px;
+  padding-bottom:16px;
   border-bottom:1px solid #eef2f7;
 }
 .section:last-child{border:none}
 .section h3{
-  margin:0 0 12px;
+  margin:0 0 14px;
   color:var(--accent);
-  font-size:16px;
 }
 label{
   font-size:13px;
@@ -66,8 +65,8 @@ input,select{
   width:100%;
   padding:12px;
   border-radius:10px;
-  border:1.6px solid #e5e7eb;
-  margin-bottom:12px;
+  border:1.8px solid #e5e7eb;
+  margin-bottom:14px;
 }
 button{
   width:100%;
@@ -80,12 +79,11 @@ button{
 .primary{background:var(--accent);color:#fff}
 .secondary{background:#eef2ff;color:#111;margin-top:10px}
 
-/* RESULTS */
 .results{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:14px;
-  margin-bottom:18px;
+  margin-bottom:20px;
 }
 .result-box{
   background:#f8fafc;
@@ -96,16 +94,8 @@ button{
 .result-box b{font-size:20px;display:block}
 .result-box small{color:var(--muted);font-size:12px}
 
-/* CHART */
-.chart-wrap{
-  width:100%;
-  height:340px;
-}
+.chart-wrap{height:340px;margin-bottom:20px}
 
-/* TABLE */
-.table-wrap{
-  margin-top:24px;
-}
 table{
   width:100%;
   border-collapse:collapse;
@@ -117,7 +107,6 @@ th,td{
   text-align:right;
 }
 th{text-align:left;color:#374151}
-td:first-child,th:first-child{text-align:center}
 
 @media(max-width:900px){
   .grid{grid-template-columns:1fr}
@@ -156,31 +145,31 @@ td:first-child,th:first-child{text-align:center}
 <div class="section">
 <h3>Payment Setup</h3>
 <label>Payment Type</label>
-<select id="paymentType">
+<select id="ptype">
 <option value="fixed">Fixed Monthly Payment</option>
-<option value="minimum">Minimum Payment (%)</option>
+<option value="minimum">Minimum % Payment</option>
 </select>
 
-<label>Monthly Payment Amount</label>
-<input id="monthlyPay" value="200">
+<label>Monthly Payment</label>
+<input id="payment" value="250">
 
 <label>Minimum Payment (%)</label>
-<input id="minPercent" value="2">
+<input id="minpct" value="2">
 </div>
 
 <div class="section">
 <h3>Extra Options</h3>
 <label>Extra Monthly Payment</label>
-<input id="extraMonthly" value="50">
+<input id="extra" value="50">
 
 <label>One-Time Lump Sum</label>
-<input id="lumpSum" value="1000">
+<input id="lump" value="1000">
 
 <label>Balance Transfer APR (%)</label>
-<input id="btApr" value="0">
+<input id="btapr" value="0">
 
 <label>Balance Transfer Fee (%)</label>
-<input id="btFee" value="3">
+<input id="btfee" value="3">
 </div>
 
 <button class="primary" onclick="calculate()">Calculate Payoff</button>
@@ -191,17 +180,16 @@ td:first-child,th:first-child{text-align:center}
 <div class="card">
 
 <div class="results">
-<div class="result-box"><b id="months">0</b><small>Months</small></div>
-<div class="result-box"><b id="interest">$0</b><small>Interest Paid</small></div>
-<div class="result-box"><b id="total">$0</b><small>Total Paid</small></div>
-<div class="result-box"><b id="saved">$0</b><small>Interest Saved</small></div>
+<div class="result-box"><b id="rMonths">0</b><small>Months</small></div>
+<div class="result-box"><b id="rInterest">$0</b><small>Interest Paid</small></div>
+<div class="result-box"><b id="rTotal">$0</b><small>Total Paid</small></div>
+<div class="result-box"><b id="rSaved">$0</b><small>Interest Saved</small></div>
 </div>
 
 <div class="chart-wrap">
 <canvas id="chart"></canvas>
 </div>
 
-<div class="table-wrap">
 <h3>Amortization Schedule</h3>
 <table>
 <thead>
@@ -215,7 +203,6 @@ td:first-child,th:first-child{text-align:center}
 </thead>
 <tbody id="table"></tbody>
 </table>
-</div>
 
 </div>
 
@@ -225,82 +212,81 @@ td:first-child,th:first-child{text-align:center}
 <script>
 let chart;
 
-function money(n){
- const cur=document.getElementById("currency").value;
- return cur+Math.round(n).toLocaleString();
-}
-
 function calculate(){
- let balance=+document.getElementById("balance").value;
- let apr=+document.getElementById("apr").value/100/12;
- let payType=document.getElementById("paymentType").value;
- let fixedPay=+document.getElementById("monthlyPay").value;
- let minPct=+document.getElementById("minPercent").value/100;
- let extra=+document.getElementById("extraMonthly").value;
- let lump=+document.getElementById("lumpSum").value;
- let btApr=+document.getElementById("btApr").value/100/12;
- let btFee=+document.getElementById("btFee").value/100;
+ const cur=document.getElementById("currency").value;
+ let bal=+balance.value;
+ let apr=+aprInput();
+ let payment=+document.getElementById("payment").value;
+ let minPct=+minpct.value/100;
+ let extra=+document.getElementById("extra").value;
+ let lump=+document.getElementById("lump").value;
+ let btAPR=+btapr.value/100;
+ let btFee=+btfee.value/100;
+ let type=ptype.value;
 
- let month=0,totalPaid=0,interestPaid=0;
- let balances=[],interestLine=[];
- let table=document.getElementById("table");
+ let monthlyRate=apr/100/12;
+ let month=0,totalPaid=0,totalInterest=0;
+ let labels=[],balances=[],interests=[];
  table.innerHTML="";
 
- if(lump>0){
-  let fee=lump*btFee;
-  balance=Math.max(0,balance-lump);
-  totalPaid+=lump+fee;
+ if(btAPR>0){
+  bal+=bal*btFee;
+  monthlyRate=btAPR/12;
  }
 
- while(balance>0 && month<600){
+ if(lump>0){ bal=Math.max(0,bal-lump); totalPaid+=lump }
+
+ while(bal>0 && month<600){
   month++;
-  let interest=balance*(btApr>0?btApr:apr);
-  let payment=payType==="fixed"?fixedPay:Math.max(balance*minPct,25);
-  payment+=extra;
-  if(payment>balance+interest) payment=balance+interest;
-  let principal=payment-interest;
-  balance=Math.max(0,balance-principal);
+  let interest=bal*monthlyRate;
+  let pay=(type==="fixed")?payment:Math.max(bal*minPct,25);
+  pay+=extra;
+  if(pay>bal+interest) pay=bal+interest;
 
-  totalPaid+=payment;
-  interestPaid+=interest;
+  let principal=pay-interest;
+  bal=Math.max(0,bal-principal);
 
-  balances.push(balance);
-  interestLine.push(interestPaid);
+  totalPaid+=pay;
+  totalInterest+=interest;
+
+  labels.push("M"+month);
+  balances.push(bal);
+  interests.push(totalInterest);
 
   table.innerHTML+=`
-  <tr>
-   <td>${month}</td>
-   <td>${money(payment)}</td>
-   <td>${money(interest)}</td>
-   <td>${money(principal)}</td>
-   <td>${money(balance)}</td>
-  </tr>`;
+   <tr>
+    <td>${month}</td>
+    <td>${cur}${pay.toFixed(0)}</td>
+    <td>${cur}${interest.toFixed(0)}</td>
+    <td>${cur}${principal.toFixed(0)}</td>
+    <td>${cur}${bal.toFixed(0)}</td>
+   </tr>`;
  }
 
- document.getElementById("months").textContent=month;
- document.getElementById("interest").textContent=money(interestPaid);
- document.getElementById("total").textContent=money(totalPaid);
- document.getElementById("saved").textContent=money(Math.max(0,(month*fixedPay)-interestPaid));
+ rMonths.textContent=month;
+ rInterest.textContent=cur+totalInterest.toFixed(0);
+ rTotal.textContent=cur+totalPaid.toFixed(0);
+ rSaved.textContent=cur+(balances.length?interests[interests.length-1]-totalInterest:0);
 
  if(chart) chart.destroy();
  chart=new Chart(document.getElementById("chart"),{
   type:"line",
   data:{
-   labels:balances.map((_,i)=>"M"+(i+1)),
+   labels,
    datasets:[
     {label:"Remaining Balance",data:balances,borderColor:"#2563eb",tension:.3},
-    {label:"Interest Paid",data:interestLine,borderColor:"#dc2626",tension:.3}
+    {label:"Interest Paid",data:interests,borderColor:"#ef4444",tension:.3}
    ]
   },
   options:{
    responsive:true,
    maintainAspectRatio:false,
-   plugins:{legend:{position:"top"}},
    scales:{y:{beginAtZero:true}}
   }
  });
 }
 
+function aprInput(){ return document.getElementById("apr").value }
 calculate();
 </script>
 </body>
