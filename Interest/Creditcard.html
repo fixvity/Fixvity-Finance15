@@ -9,7 +9,7 @@
 <style>
 :root{
   --bg:#f5f7fb;
-  --card:#fff;
+  --card:#ffffff;
   --accent:#2563eb;
   --muted:#6b7280;
   --radius:14px;
@@ -20,9 +20,18 @@ body{
   margin:0;
   font-family:Inter,system-ui,Arial;
   background:var(--bg);
+  color:#111;
 }
-h1{text-align:center;color:var(--accent);margin:20px}
-.container{max-width:1250px;margin:auto;padding:16px}
+h1{
+  text-align:center;
+  color:var(--accent);
+  margin:24px 0;
+}
+.container{
+  max-width:1300px;
+  margin:auto;
+  padding:16px;
+}
 .grid{
   display:grid;
   grid-template-columns:420px 1fr;
@@ -32,79 +41,79 @@ h1{text-align:center;color:var(--accent);margin:20px}
   background:var(--card);
   border-radius:var(--radius);
   box-shadow:var(--shadow);
-  padding:22px;
+  padding:24px;
 }
-.section{margin-bottom:18px}
-.section h3{margin:0 0 12px;color:var(--accent)}
-label{font-size:13px;color:var(--muted);display:block;margin-bottom:4px}
+.section{
+  margin-bottom:22px;
+}
+.section h3{
+  margin:0 0 10px;
+  color:var(--accent);
+}
+label{
+  font-size:13px;
+  color:var(--muted);
+  display:block;
+  margin-bottom:6px;
+}
 input,select{
   width:100%;
-  padding:10px;
+  padding:12px;
   border-radius:10px;
-  border:1px solid #e5e7eb;
+  border:1.5px solid #e5e7eb;
+  margin-bottom:14px;
+}
+.card-row{
+  display:grid;
+  grid-template-columns:1.2fr 1fr 1fr;
+  gap:10px;
   margin-bottom:10px;
 }
 button{
   width:100%;
   padding:14px;
-  border-radius:12px;
   border:none;
+  border-radius:12px;
   font-weight:600;
   cursor:pointer;
 }
 .primary{background:var(--accent);color:#fff}
-.secondary{background:#eef2ff;margin-top:8px}
+.secondary{background:#eef2ff;color:#111;margin-top:10px}
 
-.cards-grid{
-  display:grid;
-  grid-template-columns:1.2fr 1fr 1fr;
-  gap:8px;
-}
-.cards-grid input{margin-bottom:6px}
-
-.summary{
+.stats{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:12px;
-  margin-bottom:16px;
+  gap:14px;
+  margin-bottom:20px;
 }
-.box{
+.stat{
   background:#f8fafc;
   border-radius:12px;
   padding:14px;
   text-align:center;
 }
-.box b{font-size:20px}
+.stat b{font-size:20px}
+.stat span{font-size:12px;color:var(--muted)}
 
 .chart-wrap{
-  height:340px;
-}
-.chart-wrap canvas{
-  width:100% !important;
-  height:100% !important;
-}
-
-.table-wrap{
-  max-height:420px;
-  overflow:auto;
-  margin-top:14px;
+  height:360px;
 }
 table{
   width:100%;
   border-collapse:collapse;
-  font-size:14px;
+  margin-top:16px;
 }
 th,td{
-  padding:8px;
+  padding:10px;
   border-bottom:1px solid #e5e7eb;
   text-align:right;
 }
-th{text-align:center;background:#f1f5f9}
+th{text-align:left}
 
 @media(max-width:900px){
   .grid{grid-template-columns:1fr}
-  .summary{grid-template-columns:repeat(2,1fr)}
-  .chart-wrap{height:260px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .chart-wrap{height:420px}
 }
 </style>
 </head>
@@ -120,56 +129,74 @@ th{text-align:center;background:#f1f5f9}
 
 <div class="section">
 <h3>Monthly Budget</h3>
-<label>Total Monthly Payment</label>
+<label>Total Monthly Budget (for all cards)</label>
 <input id="budget" value="500">
 </div>
 
 <div class="section">
 <h3>Payoff Strategy</h3>
 <select id="strategy">
-<option value="avalanche">Avalanche (Highest APR)</option>
-<option value="snowball">Snowball (Lowest Balance)</option>
+<option value="avalanche">Avalanche – Highest APR First</option>
+<option value="snowball">Snowball – Lowest Balance First</option>
 </select>
 </div>
 
 <div class="section">
 <h3>Credit Cards</h3>
-<div id="cards"></div>
-<button class="secondary" onclick="addCard()">+ Add Card</button>
+
+<div class="card-row">
+<input placeholder="Balance ($)" class="bal" value="5000">
+<input placeholder="APR (%)" class="apr" value="18.9">
+<input placeholder="Min Payment ($)" class="min" value="100">
+</div>
+
+<div class="card-row">
+<input placeholder="Balance ($)" class="bal" value="3900">
+<input placeholder="APR (%)" class="apr" value="19.99">
+<input placeholder="Min Payment ($)" class="min" value="90">
+</div>
+
+<div class="card-row">
+<input placeholder="Balance ($)" class="bal" value="6000">
+<input placeholder="APR (%)" class="apr" value="15.99">
+<input placeholder="Min Payment ($)" class="min" value="120">
+</div>
+
 </div>
 
 <button class="primary" onclick="calculate()">Calculate Payoff</button>
-<button class="secondary" onclick="resetAll()">Reset</button>
-
+<button class="secondary" onclick="location.reload()">Reset</button>
 </div>
 
 <!-- OUTPUT -->
 <div class="card">
 
-<div class="summary">
-<div class="box"><b id="months">0</b><div>Months</div></div>
-<div class="box"><b id="interest">$0</b><div>Interest Paid</div></div>
-<div class="box"><b id="total">$0</b><div>Total Paid</div></div>
-<div class="box"><b id="saved">$0</b><div>Interest Saved</div></div>
+<div class="stats">
+<div class="stat"><b id="months">0</b><span>Months</span></div>
+<div class="stat"><b id="interest">$0</b><span>Interest Paid</span></div>
+<div class="stat"><b id="total">$0</b><span>Total Paid</span></div>
+<div class="stat"><b id="balance">$0</b><span>Remaining Balance</span></div>
 </div>
 
 <div class="chart-wrap">
 <canvas id="chart"></canvas>
 </div>
 
-<h3>Amortization Schedule</h3>
-<button class="secondary" onclick="printTable()">Print / Export</button>
+<h3>Amortization Schedule (All Cards Combined)</h3>
+<button class="secondary" onclick="window.print()">Print / Export</button>
 
-<div class="table-wrap">
 <table>
 <thead>
 <tr>
-<th>Month</th><th>Payment</th><th>Interest</th><th>Principal</th><th>Balance</th>
+<th>Month</th>
+<th>Payment</th>
+<th>Interest</th>
+<th>Principal</th>
+<th>Balance</th>
 </tr>
 </thead>
 <tbody id="table"></tbody>
 </table>
-</div>
 
 </div>
 
@@ -179,103 +206,88 @@ th{text-align:center;background:#f1f5f9}
 <script>
 let chart;
 
-function addCard(balance=5000, apr=18.9, min=100){
- const div=document.createElement("div");
- div.className="cards-grid";
- div.innerHTML=`
- <input placeholder="Balance" value="${balance}">
- <input placeholder="APR %" value="${apr}">
- <input placeholder="Min Payment" value="${min}">
- `;
- document.getElementById("cards").appendChild(div);
-}
-
-function resetAll(){location.reload()}
-
-addCard(5000,18.9,100);
-addCard(3900,19.99,90);
-addCard(6000,15.99,120);
-
 function money(n){return "$"+Math.round(n).toLocaleString()}
 
 function calculate(){
+ const balances=[...document.querySelectorAll(".bal")].map(i=>+i.value);
+ const aprs=[...document.querySelectorAll(".apr")].map(i=>+i.value/100/12);
+ const mins=[...document.querySelectorAll(".min")].map(i=>+i.value);
  const budget=+document.getElementById("budget").value;
  const strategy=document.getElementById("strategy").value;
- const rows=[...document.querySelectorAll(".cards-grid")].map(r=>{
-  const i=r.querySelectorAll("input");
-  return{
-   bal:+i[0].value,
-   apr:+i[1].value/100/12,
-   min:+i[2].value
-  }
- });
 
- let cards=rows.map(c=>({...c}));
- let month=0, totalInt=0, totalPay=0;
- let chartData=[], labels=[];
- let table=document.getElementById("table");
- table.innerHTML="";
+ let cards=balances.map((b,i)=>({bal:b,apr:aprs[i],min:mins[i]}))
+ .filter(c=>c.bal>0);
 
- while(cards.some(c=>c.bal>0) && month<600){
+ let month=0,totalInterest=0,totalPaid=0;
+ let labels=[],balancesData=[];
+ const tbody=document.getElementById("table");
+ tbody.innerHTML="";
+
+ while(cards.some(c=>c.bal>0)){
   month++;
-  let paymentLeft=budget;
-  let interestMonth=0;
-  
+  let interest=0,principal=0;
+  let remaining=budget;
+
   cards.forEach(c=>{
-   if(c.bal<=0) return;
-   const i=c.bal*c.apr;
-   interestMonth+=i;
-   totalInt+=i;
-   c.bal+=i;
+    let i=c.bal*c.apr;
+    interest+=i;
+    c.bal+=i;
   });
 
-  let ordered=[...cards].filter(c=>c.bal>0);
-  ordered.sort((a,b)=>strategy==="avalanche"?b.apr-a.apr:a.bal-b.bal);
-
-  ordered.forEach(c=>{
-   if(paymentLeft<=0) return;
-   const pay=Math.max(c.min, Math.min(c.bal,paymentLeft));
-   c.bal-=pay;
-   paymentLeft-=pay;
-   totalPay+=pay;
+  cards.forEach(c=>{
+    let p=Math.min(c.min,c.bal,remaining);
+    c.bal-=p;
+    remaining-=p;
+    principal+=p;
   });
 
-  const totalBal=cards.reduce((s,c)=>s+Math.max(0,c.bal),0);
-  chartData.push(totalBal);
+  cards.sort((a,b)=>{
+    return strategy==="avalanche"?b.apr-a.apr:a.bal-b.bal;
+  });
+
+  for(let c of cards){
+    if(remaining<=0) break;
+    let p=Math.min(c.bal,remaining);
+    c.bal-=p;
+    remaining-=p;
+    principal+=p;
+  }
+
+  let balSum=cards.reduce((s,c)=>s+c.bal,0);
+  totalInterest+=interest;
+  totalPaid+=principal;
+
   labels.push("M"+month);
+  balancesData.push(balSum);
 
-  table.innerHTML+=`
+  tbody.innerHTML+=`
    <tr>
     <td>${month}</td>
-    <td>${money(budget)}</td>
-    <td>${money(interestMonth)}</td>
-    <td>${money(budget-interestMonth)}</td>
-    <td>${money(totalBal)}</td>
+    <td>${money(principal)}</td>
+    <td>${money(interest)}</td>
+    <td>${money(principal-interest)}</td>
+    <td>${money(balSum)}</td>
    </tr>`;
  }
 
  document.getElementById("months").textContent=month;
- document.getElementById("interest").textContent=money(totalInt);
- document.getElementById("total").textContent=money(totalPay);
- document.getElementById("saved").textContent=money(0);
+ document.getElementById("interest").textContent=money(totalInterest);
+ document.getElementById("total").textContent=money(totalPaid);
+ document.getElementById("balance").textContent="$0";
 
  if(chart) chart.destroy();
  chart=new Chart(document.getElementById("chart"),{
   type:"line",
   data:{labels,datasets:[{
-   label:"Remaining Balance",
-   data:chartData,
-   borderColor:"#2563eb",
-   tension:.35
+    label:"Remaining Balance",
+    data:balancesData,
+    borderColor:"#2563eb",
+    tension:.3
   }]},
-  options:{
-   responsive:true,
-   maintainAspectRatio:false
-  }
+  options:{maintainAspectRatio:false}
  });
 }
 
-function printTable(){window.print()}
 calculate();
 </script>
 </body>
