@@ -15,7 +15,7 @@
   --danger:#dc2626;
   --muted:#6b7280;
   --radius:14px;
-  --shadow:0 10px 30px rgba(0,0,0,.08);
+  --shadow:0 12px 32px rgba(0,0,0,.08);
 }
 *{box-sizing:border-box}
 body{
@@ -30,7 +30,7 @@ h1{
   margin:24px 0;
 }
 .container{
-  max-width:1200px;
+  max-width:1300px;
   margin:auto;
   padding:16px;
 }
@@ -43,32 +43,31 @@ h1{
   background:var(--card);
   border-radius:var(--radius);
   box-shadow:var(--shadow);
-  padding:24px;
+  padding:22px;
 }
 .section{
-  margin-bottom:22px;
-  padding-bottom:18px;
+  margin-bottom:18px;
+  padding-bottom:14px;
   border-bottom:1px solid #eef2f7;
 }
 .section:last-child{border:none}
 .section h3{
-  margin:0 0 14px;
+  margin:0 0 12px;
   color:var(--accent);
   font-size:16px;
 }
 label{
   font-size:13px;
   color:var(--muted);
-  display:block;
   margin-bottom:6px;
+  display:block;
 }
 input,select{
   width:100%;
   padding:12px;
   border-radius:10px;
-  border:1.8px solid #e5e7eb;
-  margin-bottom:14px;
-  font-size:14px;
+  border:1.6px solid #e5e7eb;
+  margin-bottom:12px;
 }
 button{
   width:100%;
@@ -81,11 +80,12 @@ button{
 .primary{background:var(--accent);color:#fff}
 .secondary{background:#eef2ff;color:#111;margin-top:10px}
 
+/* RESULTS */
 .results{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:14px;
-  margin-bottom:22px;
+  margin-bottom:18px;
 }
 .result-box{
   background:#f8fafc;
@@ -93,24 +93,36 @@ button{
   padding:16px;
   text-align:center;
 }
-.result-box b{
-  font-size:20px;
-  display:block;
-}
-.result-box small{
-  color:var(--muted);
-  font-size:12px;
+.result-box b{font-size:20px;display:block}
+.result-box small{color:var(--muted);font-size:12px}
+
+/* CHART */
+.chart-wrap{
+  width:100%;
+  height:340px;
 }
 
-.chart-wrap{
-  height:300px;
-  margin-top:12px;
+/* TABLE */
+.table-wrap{
+  margin-top:24px;
 }
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
+th,td{
+  padding:8px;
+  border-bottom:1px solid #e5e7eb;
+  text-align:right;
+}
+th{text-align:left;color:#374151}
+td:first-child,th:first-child{text-align:center}
 
 @media(max-width:900px){
   .grid{grid-template-columns:1fr}
   .results{grid-template-columns:repeat(2,1fr)}
-  .card{padding:18px}
+  .chart-wrap{height:260px}
 }
 </style>
 </head>
@@ -121,82 +133,88 @@ button{
 <div class="container">
 <div class="grid">
 
-<!-- INPUT PANEL -->
+<!-- INPUT -->
 <div class="card">
 
 <div class="section">
 <h3>Card Details</h3>
 <label>Currency</label>
-<select>
-  <option>$ USD</option>
-  <option>€ EUR</option>
-  <option>£ GBP</option>
-  <option>₹ INR</option>
+<select id="currency">
+<option value="$">$ USD</option>
+<option value="€">€ EUR</option>
+<option value="£">£ GBP</option>
+<option value="₹">₹ INR</option>
 </select>
 
 <label>Current Balance</label>
-<input placeholder="e.g. 5000">
+<input id="balance" value="5000">
 
-<label>Annual Interest Rate (APR %)</label>
-<input placeholder="e.g. 18.9">
+<label>APR (%)</label>
+<input id="apr" value="18.9">
 </div>
 
 <div class="section">
 <h3>Payment Setup</h3>
 <label>Payment Type</label>
-<select>
-  <option>Fixed Monthly Payment</option>
-  <option>Minimum Payment Only</option>
-  <option>Target Payoff Time</option>
+<select id="paymentType">
+<option value="fixed">Fixed Monthly Payment</option>
+<option value="minimum">Minimum Payment (%)</option>
 </select>
 
 <label>Monthly Payment Amount</label>
-<input placeholder="e.g. 200">
+<input id="monthlyPay" value="200">
 
 <label>Minimum Payment (%)</label>
-<input placeholder="e.g. 2">
+<input id="minPercent" value="2">
 </div>
 
 <div class="section">
 <h3>Extra Options</h3>
 <label>Extra Monthly Payment</label>
-<input placeholder="e.g. 50">
+<input id="extraMonthly" value="50">
 
-<label>One-Time Lump Sum Payment</label>
-<input placeholder="e.g. 1000">
+<label>One-Time Lump Sum</label>
+<input id="lumpSum" value="1000">
 
 <label>Balance Transfer APR (%)</label>
-<input placeholder="Optional">
+<input id="btApr" value="0">
+
+<label>Balance Transfer Fee (%)</label>
+<input id="btFee" value="3">
 </div>
 
-<button class="primary">Calculate Payoff</button>
-<button class="secondary">Reset</button>
+<button class="primary" onclick="calculate()">Calculate Payoff</button>
+<button class="secondary" onclick="location.reload()">Reset</button>
 </div>
 
-<!-- OUTPUT PANEL -->
+<!-- OUTPUT -->
 <div class="card">
 
 <div class="results">
-  <div class="result-box">
-    <b>36</b>
-    <small>Months to Pay Off</small>
-  </div>
-  <div class="result-box">
-    <b>$1,420</b>
-    <small>Total Interest Paid</small>
-  </div>
-  <div class="result-box">
-    <b>$6,420</b>
-    <small>Total Amount Paid</small>
-  </div>
-  <div class="result-box">
-    <b>$890</b>
-    <small>Interest Saved</small>
-  </div>
+<div class="result-box"><b id="months">0</b><small>Months</small></div>
+<div class="result-box"><b id="interest">$0</b><small>Interest Paid</small></div>
+<div class="result-box"><b id="total">$0</b><small>Total Paid</small></div>
+<div class="result-box"><b id="saved">$0</b><small>Interest Saved</small></div>
 </div>
 
 <div class="chart-wrap">
 <canvas id="chart"></canvas>
+</div>
+
+<div class="table-wrap">
+<h3>Amortization Schedule</h3>
+<table>
+<thead>
+<tr>
+<th>Month</th>
+<th>Payment</th>
+<th>Interest</th>
+<th>Principal</th>
+<th>Balance</th>
+</tr>
+</thead>
+<tbody id="table"></tbody>
+</table>
 </div>
 
 </div>
@@ -205,26 +223,85 @@ button{
 </div>
 
 <script>
-new Chart(document.getElementById("chart"),{
- type:"line",
- data:{
-  labels:["Month 1","Month 6","Month 12","Month 18","Month 24","Month 30","Month 36"],
-  datasets:[
-   {
-    label:"Remaining Balance",
-    data:[5000,4200,3300,2400,1600,800,0],
-    borderColor:"#2563eb",
-    tension:.35
-   },
-   {
-    label:"Interest Paid",
-    data:[0,300,600,900,1200,1350,1420],
-    borderColor:"#dc2626",
-    tension:.35
-   }
-  ]
+let chart;
+
+function money(n){
+ const cur=document.getElementById("currency").value;
+ return cur+Math.round(n).toLocaleString();
+}
+
+function calculate(){
+ let balance=+document.getElementById("balance").value;
+ let apr=+document.getElementById("apr").value/100/12;
+ let payType=document.getElementById("paymentType").value;
+ let fixedPay=+document.getElementById("monthlyPay").value;
+ let minPct=+document.getElementById("minPercent").value/100;
+ let extra=+document.getElementById("extraMonthly").value;
+ let lump=+document.getElementById("lumpSum").value;
+ let btApr=+document.getElementById("btApr").value/100/12;
+ let btFee=+document.getElementById("btFee").value/100;
+
+ let month=0,totalPaid=0,interestPaid=0;
+ let balances=[],interestLine=[];
+ let table=document.getElementById("table");
+ table.innerHTML="";
+
+ if(lump>0){
+  let fee=lump*btFee;
+  balance=Math.max(0,balance-lump);
+  totalPaid+=lump+fee;
  }
-});
+
+ while(balance>0 && month<600){
+  month++;
+  let interest=balance*(btApr>0?btApr:apr);
+  let payment=payType==="fixed"?fixedPay:Math.max(balance*minPct,25);
+  payment+=extra;
+  if(payment>balance+interest) payment=balance+interest;
+  let principal=payment-interest;
+  balance=Math.max(0,balance-principal);
+
+  totalPaid+=payment;
+  interestPaid+=interest;
+
+  balances.push(balance);
+  interestLine.push(interestPaid);
+
+  table.innerHTML+=`
+  <tr>
+   <td>${month}</td>
+   <td>${money(payment)}</td>
+   <td>${money(interest)}</td>
+   <td>${money(principal)}</td>
+   <td>${money(balance)}</td>
+  </tr>`;
+ }
+
+ document.getElementById("months").textContent=month;
+ document.getElementById("interest").textContent=money(interestPaid);
+ document.getElementById("total").textContent=money(totalPaid);
+ document.getElementById("saved").textContent=money(Math.max(0,(month*fixedPay)-interestPaid));
+
+ if(chart) chart.destroy();
+ chart=new Chart(document.getElementById("chart"),{
+  type:"line",
+  data:{
+   labels:balances.map((_,i)=>"M"+(i+1)),
+   datasets:[
+    {label:"Remaining Balance",data:balances,borderColor:"#2563eb",tension:.3},
+    {label:"Interest Paid",data:interestLine,borderColor:"#dc2626",tension:.3}
+   ]
+  },
+  options:{
+   responsive:true,
+   maintainAspectRatio:false,
+   plugins:{legend:{position:"top"}},
+   scales:{y:{beginAtZero:true}}
+  }
+ });
+}
+
+calculate();
 </script>
 </body>
 </html>
