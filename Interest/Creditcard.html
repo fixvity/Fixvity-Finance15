@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Multi-Card Credit Card Payoff Calculator</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 :root{
   --bg:#f5f7fb;
   --card:#ffffff;
-  --accent:#2f6ce5;
+  --primary:#2563eb;
   --muted:#6b7280;
+  --border:#e5e7eb;
   --radius:14px;
   --shadow:0 10px 30px rgba(0,0,0,.08);
 }
@@ -24,17 +26,17 @@ body{
 }
 h1{
   text-align:center;
-  margin:22px 0;
-  color:var(--accent);
+  color:var(--primary);
+  margin:24px 0;
 }
 .container{
-  max-width:1300px;
+  max-width:1200px;
   margin:auto;
   padding:16px;
 }
 .grid{
   display:grid;
-  grid-template-columns:420px 1fr;
+  grid-template-columns:380px 1fr;
   gap:24px;
 }
 .card{
@@ -47,25 +49,26 @@ h1{
   margin-bottom:20px;
 }
 .section h3{
-  margin:0 0 8px;
-  color:var(--accent);
+  margin:0 0 6px;
+  color:var(--primary);
 }
-.help{
-  font-size:12px;
+.section p{
+  margin:0 0 10px;
+  font-size:13px;
   color:var(--muted);
-  margin-bottom:8px;
 }
 input,select{
   width:100%;
-  padding:11px;
+  padding:12px;
   border-radius:10px;
-  border:1.5px solid #e5e7eb;
-  margin-bottom:12px;
+  border:1.5px solid var(--border);
+  margin-bottom:10px;
 }
 .card-grid{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
-  gap:10px;
+  gap:8px;
+  margin-bottom:8px;
 }
 button{
   width:100%;
@@ -75,47 +78,49 @@ button{
   font-weight:600;
   cursor:pointer;
 }
-.primary{background:var(--accent);color:#fff}
-.secondary{background:#eef2ff;margin-top:10px}
+.primary{background:var(--primary);color:#fff}
+.secondary{background:#eef2ff;color:#111;margin-top:8px}
 
 .stats{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-bottom:16px;
+  gap:12px;
+  margin-bottom:18px;
 }
 .stat{
   background:#f8fafc;
-  border-radius:12px;
   padding:14px;
+  border-radius:12px;
   text-align:center;
 }
-.stat b{font-size:20px;display:block}
-.stat small{color:var(--muted)}
+.stat b{font-size:18px;display:block}
 
 .chart-wrap{
-  height:360px;
+  width:100%;
+  height:340px;
 }
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+th,td{
+  padding:8px;
+  border-bottom:1px solid var(--border);
+  text-align:right;
+  font-size:13px;
+}
+th{text-align:left;background:#f1f5f9}
 @media(max-width:900px){
   .grid{grid-template-columns:1fr}
   .stats{grid-template-columns:repeat(2,1fr)}
   .chart-wrap{height:280px}
 }
-table{
-  width:100%;
-  border-collapse:collapse;
-  margin-top:14px;
-}
-th,td{
-  padding:10px;
-  border-bottom:1px solid #e5e7eb;
-  text-align:right;
-}
-th{text-align:left;background:#f1f5f9}
 </style>
 </head>
 
 <body>
+
 <h1>💳 Multi-Card Credit Card Payoff Calculator</h1>
 
 <div class="container">
@@ -126,16 +131,16 @@ th{text-align:left;background:#f1f5f9}
 
 <div class="section">
 <h3>Monthly Budget</h3>
-<div class="help">Total amount you can pay every month across all cards</div>
+<p>Total amount you can pay every month across all cards</p>
 <input id="budget" value="500">
 </div>
 
 <div class="section">
 <h3>Payoff Strategy</h3>
-<div class="help">
-Avalanche = lowest interest paid<br>
+<p>
+Avalanche = highest APR first (saves interest)<br>
 Snowball = smallest balance first (faster wins)
-</div>
+</p>
 <select id="strategy">
 <option value="avalanche">Avalanche (Highest APR)</option>
 <option value="snowball">Snowball (Smallest Balance)</option>
@@ -144,21 +149,25 @@ Snowball = smallest balance first (faster wins)
 
 <div class="section">
 <h3>Credit Cards</h3>
-<div class="help">Balance | APR % | Minimum Payment</div>
+<p>Balance | APR % | Minimum Payment</p>
 
 <div class="card-grid">
 <input value="5000">
 <input value="18.9">
 <input value="100">
-
+</div>
+<div class="card-grid">
 <input value="3900">
 <input value="19.99">
 <input value="90">
-
+</div>
+<div class="card-grid">
 <input value="6000">
 <input value="15.99">
 <input value="120">
 </div>
+
+<button class="secondary">+ Add Card</button>
 </div>
 
 <button class="primary" onclick="calculate()">Calculate Payoff</button>
@@ -170,10 +179,10 @@ Snowball = smallest balance first (faster wins)
 <div class="card">
 
 <div class="stats">
-<div class="stat"><b id="months">–</b><small>Months</small></div>
-<div class="stat"><b id="interest">–</b><small>Interest Paid</small></div>
-<div class="stat"><b id="paid">–</b><small>Total Paid</small></div>
-<div class="stat"><b id="remaining">–</b><small>Remaining</small></div>
+<div class="stat"><b id="mMonths">–</b><small>Months</small></div>
+<div class="stat"><b id="mInterest">$0</b><small>Interest Paid</small></div>
+<div class="stat"><b id="mTotal">$0</b><small>Total Paid</small></div>
+<div class="stat"><b id="mRemain">$0</b><small>Remaining</small></div>
 </div>
 
 <div class="chart-wrap">
@@ -203,96 +212,78 @@ Snowball = smallest balance first (faster wins)
 
 <script>
 let chart;
-const money=n=>"$"+Math.round(n).toLocaleString();
+function money(n){return "$"+Math.round(n).toLocaleString()}
 
 function calculate(){
-const budget=+document.getElementById("budget").value;
-const strategy=document.getElementById("strategy").value;
+let budget=+document.getElementById("budget").value;
+let cards=[...document.querySelectorAll(".card-grid")].map(r=>{
+let i=r.querySelectorAll("input");
+return{bal:+i[0].value,apr:+i[1].value/100,min:+i[2].value}
+});
+let strat=document.getElementById("strategy").value;
+let month=0,interestSum=0,totalPaid=0;
+let balances=[],labels=[],rows="";
 
-const inputs=[...document.querySelectorAll(".card-grid input")];
-let cards=[];
-for(let i=0;i<inputs.length;i+=3){
- cards.push({
-  bal:+inputs[i].value,
-  apr:+inputs[i+1].value/100/12,
-  min:+inputs[i+2].value
- });
+while(cards.some(c=>c.bal>0) && month<600){
+month++;
+let payment=budget;
+let interestMonth=0,principalMonth=0;
+
+cards.forEach(c=>{
+if(c.bal<=0) return;
+let i=c.bal*(c.apr/12);
+interestMonth+=i;
+c.bal+=i;
+let p=Math.min(c.min,c.bal);
+c.bal-=p;
+payment-=p;
+principalMonth+=p-i;
+});
+
+let target=[...cards].filter(c=>c.bal>0).sort((a,b)=>{
+return strat==="avalanche"?b.apr-a.apr:a.bal-b.bal
+})[0];
+
+if(target && payment>0){
+let extra=Math.min(payment,target.bal);
+target.bal-=extra;
+principalMonth+=extra;
+payment-=extra;
 }
 
-let month=0,totalInterest=0,totalPaid=0;
-let balances=cards.reduce((s,c)=>s+c.bal,0);
-let labels=[],balanceData=[];
-let tbody=document.getElementById("table");
-tbody.innerHTML="";
+interestSum+=interestMonth;
+totalPaid+=budget-payment;
+let totalBal=cards.reduce((s,c)=>s+c.bal,0);
 
-while(balances>0 && month<600){
- month++;
- let interest=0,payment=0;
+labels.push("M"+month);
+balances.push(totalBal);
 
- cards.forEach(c=>{
-  if(c.bal>0){
-   let i=c.bal*c.apr;
-   interest+=i;
-   c.bal+=i;
-  }
- });
+rows+=`<tr>
+<td>${month}</td>
+<td>${money(budget-payment)}</td>
+<td>${money(interestMonth)}</td>
+<td>${money(budget-payment-interestMonth)}</td>
+<td>${money(totalBal)}</td>
+</tr>`;
 
- let remaining=budget;
- let order=[...cards];
- if(strategy==="avalanche") order.sort((a,b)=>b.apr-a.apr);
- else order.sort((a,b)=>a.bal-b.bal);
-
- order.forEach(c=>{
-  if(c.bal>0 && remaining>0){
-   let pay=Math.min(c.bal,remaining);
-   c.bal-=pay;
-   remaining-=pay;
-   payment+=pay;
-  }
- });
-
- totalInterest+=interest;
- totalPaid+=payment;
- balances=cards.reduce((s,c)=>s+c.bal,0);
-
- tbody.innerHTML+=`
- <tr>
- <td>${month}</td>
- <td>${money(payment)}</td>
- <td>${money(interest)}</td>
- <td>${money(payment-interest)}</td>
- <td>${money(balances)}</td>
- </tr>`;
-
- labels.push("M"+month);
- balanceData.push(balances);
+if(totalBal<=0) break;
 }
 
-document.getElementById("months").textContent=month;
-document.getElementById("interest").textContent=money(totalInterest);
-document.getElementById("paid").textContent=money(totalPaid);
-document.getElementById("remaining").textContent=money(balances);
+document.getElementById("mMonths").textContent=month;
+document.getElementById("mInterest").textContent=money(interestSum);
+document.getElementById("mTotal").textContent=money(totalPaid);
+document.getElementById("mRemain").textContent="$0";
+document.getElementById("table").innerHTML=rows;
 
 if(chart) chart.destroy();
 chart=new Chart(document.getElementById("chart"),{
- type:"line",
- data:{
-  labels,
-  datasets:[{
-   label:"Remaining Balance",
-   data:balanceData,
-   borderColor:"#2f6ce5",
-   tension:.3,
-   fill:false
-  }]
- },
- options:{
-  responsive:true,
-  maintainAspectRatio:false
- }
+type:"line",
+data:{labels,datasets:[{label:"Remaining Balance",data:balances,borderColor:"#2563eb",tension:.35}]},
+options:{responsive:true,maintainAspectRatio:false}
 });
 }
 calculate();
 </script>
+
 </body>
 </html>
