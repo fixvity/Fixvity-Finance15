@@ -30,45 +30,48 @@ h1{
   margin:24px 0;
 }
 .container{
-  max-width:1200px;
+  max-width:1300px;
   margin:auto;
   padding:16px;
 }
 .grid{
   display:grid;
-  grid-template-columns:380px 1fr;
+  grid-template-columns:420px 1fr;
   gap:24px;
 }
 .card{
   background:var(--card);
   border-radius:var(--radius);
   box-shadow:var(--shadow);
-  padding:22px;
+  padding:24px;
 }
 .section{
-  margin-bottom:20px;
+  margin-bottom:22px;
 }
 .section h3{
-  margin:0 0 6px;
+  margin:0 0 10px;
   color:var(--primary);
 }
-.section p{
-  margin:0 0 10px;
-  font-size:13px;
+small{
   color:var(--muted);
+  font-size:12px;
+}
+label{
+  display:block;
+  font-size:13px;
+  margin:10px 0 6px;
 }
 input,select{
   width:100%;
   padding:12px;
   border-radius:10px;
-  border:1.5px solid var(--border);
-  margin-bottom:10px;
+  border:1.6px solid var(--border);
 }
-.card-grid{
+.card-row{
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
-  gap:8px;
-  margin-bottom:8px;
+  gap:10px;
+  margin-bottom:10px;
 }
 button{
   width:100%;
@@ -79,110 +82,119 @@ button{
   cursor:pointer;
 }
 .primary{background:var(--primary);color:#fff}
-.secondary{background:#eef2ff;color:#111;margin-top:8px}
+.secondary{background:#eef2ff;margin-top:10px}
 
-.stats{
+.summary{
   display:grid;
   grid-template-columns:repeat(4,1fr);
-  gap:12px;
+  gap:14px;
   margin-bottom:18px;
 }
-.stat{
+.summary div{
   background:#f8fafc;
-  padding:14px;
   border-radius:12px;
+  padding:14px;
   text-align:center;
 }
-.stat b{font-size:18px;display:block}
+.summary b{font-size:20px}
 
 .chart-wrap{
-  width:100%;
-  height:340px;
+  height:320px;
+  margin-bottom:20px;
 }
+
 table{
   width:100%;
   border-collapse:collapse;
-  margin-top:10px;
-}
-th,td{
-  padding:8px;
-  border-bottom:1px solid var(--border);
-  text-align:right;
   font-size:13px;
 }
-th{text-align:left;background:#f1f5f9}
+th,td{
+  padding:10px;
+  border-bottom:1px solid var(--border);
+  text-align:right;
+}
+th{text-align:center;background:#f1f5f9}
+td:first-child,th:first-child{text-align:center}
+
+.print-btn{
+  background:#eef2ff;
+  margin-bottom:10px;
+}
+
 @media(max-width:900px){
   .grid{grid-template-columns:1fr}
-  .stats{grid-template-columns:repeat(2,1fr)}
-  .chart-wrap{height:280px}
+  .summary{grid-template-columns:repeat(2,1fr)}
+  .chart-wrap{height:260px}
+}
+@media print{
+  button,.chart-wrap{display:none}
+  body{background:#fff}
 }
 </style>
 </head>
 
 <body>
-
 <h1>💳 Multi-Card Credit Card Payoff Calculator</h1>
 
 <div class="container">
 <div class="grid">
 
-<!-- LEFT -->
+<!-- INPUT -->
 <div class="card">
-
 <div class="section">
 <h3>Monthly Budget</h3>
-<p>Total amount you can pay every month across all cards</p>
-<input id="budget" value="500">
+<small>Total amount you can pay every month across all cards</small>
+<input id="budget" value="500" />
 </div>
 
 <div class="section">
 <h3>Payoff Strategy</h3>
-<p>
-Avalanche = highest APR first (saves interest)<br>
-Snowball = smallest balance first (faster wins)
-</p>
+<small>
+Avalanche = lowest interest paid<br>
+Snowball = fastest psychological wins
+</small>
 <select id="strategy">
 <option value="avalanche">Avalanche (Highest APR)</option>
-<option value="snowball">Snowball (Smallest Balance)</option>
+<option value="snowball">Snowball (Lowest Balance)</option>
 </select>
 </div>
 
 <div class="section">
 <h3>Credit Cards</h3>
-<p>Balance | APR % | Minimum Payment</p>
+<small>Balance | APR (%) | Minimum Payment</small>
 
-<div class="card-grid">
+<div id="cards">
+<div class="card-row">
 <input value="5000">
 <input value="18.9">
 <input value="100">
 </div>
-<div class="card-grid">
+<div class="card-row">
 <input value="3900">
 <input value="19.99">
 <input value="90">
 </div>
-<div class="card-grid">
+<div class="card-row">
 <input value="6000">
 <input value="15.99">
 <input value="120">
 </div>
+</div>
 
-<button class="secondary">+ Add Card</button>
+<button class="secondary" onclick="addCard()">+ Add Card</button>
 </div>
 
 <button class="primary" onclick="calculate()">Calculate Payoff</button>
 <button class="secondary" onclick="location.reload()">Reset</button>
-
 </div>
 
-<!-- RIGHT -->
+<!-- OUTPUT -->
 <div class="card">
-
-<div class="stats">
-<div class="stat"><b id="mMonths">–</b><small>Months</small></div>
-<div class="stat"><b id="mInterest">$0</b><small>Interest Paid</small></div>
-<div class="stat"><b id="mTotal">$0</b><small>Total Paid</small></div>
-<div class="stat"><b id="mRemain">$0</b><small>Remaining</small></div>
+<div class="summary">
+<div><b id="mMonths">–</b><small>Months</small></div>
+<div><b id="mInterest">$0</b><small>Interest Paid</small></div>
+<div><b id="mTotal">$0</b><small>Total Paid</small></div>
+<div><b id="mRemain">$0</b><small>Remaining</small></div>
 </div>
 
 <div class="chart-wrap">
@@ -190,7 +202,7 @@ Snowball = smallest balance first (faster wins)
 </div>
 
 <h3>Amortization Schedule (All Cards Combined)</h3>
-<button class="secondary" onclick="window.print()">Print / Export</button>
+<button class="print-btn" onclick="window.print()">Print / Export</button>
 
 <table>
 <thead>
@@ -204,7 +216,6 @@ Snowball = smallest balance first (faster wins)
 </thead>
 <tbody id="table"></tbody>
 </table>
-
 </div>
 
 </div>
@@ -212,78 +223,106 @@ Snowball = smallest balance first (faster wins)
 
 <script>
 let chart;
-function money(n){return "$"+Math.round(n).toLocaleString()}
+const money=n=>"$"+Math.round(n).toLocaleString();
+
+function addCard(){
+  const row=document.createElement("div");
+  row.className="card-row";
+  row.innerHTML='<input placeholder="Balance"><input placeholder="APR %"><input placeholder="Min Payment">';
+  document.getElementById("cards").appendChild(row);
+}
 
 function calculate(){
 let budget=+document.getElementById("budget").value;
-let cards=[...document.querySelectorAll(".card-grid")].map(r=>{
-let i=r.querySelectorAll("input");
-return{bal:+i[0].value,apr:+i[1].value/100,min:+i[2].value}
-});
-let strat=document.getElementById("strategy").value;
-let month=0,interestSum=0,totalPaid=0;
-let balances=[],labels=[],rows="";
+let strategy=document.getElementById("strategy").value;
+
+let cards=[...document.querySelectorAll("#cards .card-row")].map(r=>{
+  let i=r.querySelectorAll("input");
+  return{
+    bal:+i[0].value,
+    apr:+i[1].value/100/12,
+    min:+i[2].value,
+    interest:0
+  }
+}).filter(c=>c.bal>0);
+
+if(strategy==="avalanche") cards.sort((a,b)=>b.apr-a.apr);
+if(strategy==="snowball") cards.sort((a,b)=>a.bal-b.bal);
+
+let month=0,totalInterest=0,totalPaid=0;
+let rows=[],chartData=[];
 
 while(cards.some(c=>c.bal>0) && month<600){
-month++;
-let payment=budget;
-let interestMonth=0,principalMonth=0;
+  month++;
+  let payment=0,interest=0;
 
-cards.forEach(c=>{
-if(c.bal<=0) return;
-let i=c.bal*(c.apr/12);
-interestMonth+=i;
-c.bal+=i;
-let p=Math.min(c.min,c.bal);
-c.bal-=p;
-payment-=p;
-principalMonth+=p-i;
-});
+  cards.forEach(c=>{
+    if(c.bal>0){
+      let i=c.bal*c.apr;
+      interest+=i;
+      c.bal+=i;
+      c.interest+=i;
+    }
+  });
 
-let target=[...cards].filter(c=>c.bal>0).sort((a,b)=>{
-return strat==="avalanche"?b.apr-a.apr:a.bal-b.bal
-})[0];
+  let remaining=budget;
+  cards.forEach(c=>{
+    if(c.bal>0){
+      let p=Math.min(c.min,c.bal,remaining);
+      c.bal-=p;
+      remaining-=p;
+      payment+=p;
+    }
+  });
 
-if(target && payment>0){
-let extra=Math.min(payment,target.bal);
-target.bal-=extra;
-principalMonth+=extra;
-payment-=extra;
-}
+  cards.forEach(c=>{
+    if(c.bal>0 && remaining>0){
+      let p=Math.min(c.bal,remaining);
+      c.bal-=p;
+      remaining-=p;
+      payment+=p;
+    }
+  });
 
-interestSum+=interestMonth;
-totalPaid+=budget-payment;
-let totalBal=cards.reduce((s,c)=>s+c.bal,0);
-
-labels.push("M"+month);
-balances.push(totalBal);
-
-rows+=`<tr>
-<td>${month}</td>
-<td>${money(budget-payment)}</td>
-<td>${money(interestMonth)}</td>
-<td>${money(budget-payment-interestMonth)}</td>
-<td>${money(totalBal)}</td>
-</tr>`;
-
-if(totalBal<=0) break;
+  let balSum=cards.reduce((s,c)=>s+c.bal,0);
+  rows.push([month,payment,interest,payment-interest,balSum]);
+  chartData.push(balSum);
+  totalInterest+=interest;
+  totalPaid+=payment;
 }
 
 document.getElementById("mMonths").textContent=month;
-document.getElementById("mInterest").textContent=money(interestSum);
+document.getElementById("mInterest").textContent=money(totalInterest);
 document.getElementById("mTotal").textContent=money(totalPaid);
 document.getElementById("mRemain").textContent="$0";
-document.getElementById("table").innerHTML=rows;
+
+const tbody=document.getElementById("table");
+tbody.innerHTML="";
+rows.forEach(r=>{
+  tbody.innerHTML+=`<tr>
+<td>${r[0]}</td>
+<td>${money(r[1])}</td>
+<td>${money(r[2])}</td>
+<td>${money(r[3])}</td>
+<td>${money(r[4])}</td>
+</tr>`;
+});
 
 if(chart) chart.destroy();
 chart=new Chart(document.getElementById("chart"),{
-type:"line",
-data:{labels,datasets:[{label:"Remaining Balance",data:balances,borderColor:"#2563eb",tension:.35}]},
-options:{responsive:true,maintainAspectRatio:false}
+ type:"line",
+ data:{
+  labels:chartData.map((_,i)=>"M"+(i+1)),
+  datasets:[{
+    label:"Remaining Balance",
+    data:chartData,
+    borderColor:"#2563eb",
+    tension:.35
+  }]
+ },
+ options:{responsive:true,maintainAspectRatio:false}
 });
 }
-calculate();
 </script>
-
 </body>
 </html>
