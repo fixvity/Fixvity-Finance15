@@ -49,9 +49,7 @@ h1{
   display:flex;
   flex-direction:column;
 }
-.section{
-  margin-bottom:18px;
-}
+.section{margin-bottom:18px}
 .section h3{
   margin:0 0 10px;
   color:var(--primary);
@@ -60,8 +58,8 @@ h1{
 label{
   font-size:12px;
   color:var(--muted);
-  display:block;
   margin-bottom:4px;
+  display:block;
 }
 input,select{
   width:100%;
@@ -92,7 +90,7 @@ button{
 }
 .card-grid{
   display:grid;
-  grid-template-columns:1fr 1fr 1fr;
+  grid-template-columns:repeat(3,1fr);
   gap:10px;
 }
 
@@ -100,7 +98,7 @@ button{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:14px;
-  margin-bottom:16px;
+  margin-bottom:14px;
 }
 .result-box{
   background:#f8fafc;
@@ -108,50 +106,42 @@ button{
   padding:14px;
   text-align:center;
 }
-.result-box b{
-  font-size:18px;
-  display:block;
-}
-.result-box small{
-  font-size:12px;
-  color:var(--muted);
-}
+.result-box b{font-size:18px;display:block}
+.result-box small{font-size:12px;color:var(--muted)}
 
 .chart-wrap{
   height:260px;
+  margin-bottom:10px;
 }
 
 .table-wrap{
-  margin-top:14px;
   border:1px solid var(--border);
   border-radius:12px;
   overflow:hidden;
   flex:1;
 }
-.table-wrap table{
+.table-scroll{
+  max-height:360px;       /* ✅ FIXED HEIGHT */
+  overflow:auto;
+}
+table{
   width:100%;
   border-collapse:collapse;
   font-size:13px;
 }
-.table-wrap thead{
-  background:#f1f5f9;
+thead{
   position:sticky;
   top:0;
+  background:#f1f5f9;
+  z-index:1;
 }
-.table-wrap th,
-.table-wrap td{
+th,td{
   padding:8px;
   border-bottom:1px solid var(--border);
   text-align:right;
 }
-.table-wrap th:first-child,
-.table-wrap td:first-child{
-  text-align:center;
-}
-.table-body{
-  max-height:380px;
-  overflow:auto;
-}
+th:first-child,
+td:first-child{text-align:center}
 
 @media(max-width:900px){
   .grid{grid-template-columns:1fr}
@@ -177,7 +167,7 @@ button{
 
 <div class="section">
 <h3>Payoff Strategy</h3>
-<label>Avalanche = highest APR first • Snowball = smallest balance first</label>
+<label>Avalanche = highest APR • Snowball = smallest balance</label>
 <select id="strategy">
   <option value="avalanche">Avalanche (Highest APR)</option>
   <option value="snowball">Snowball (Smallest Balance)</option>
@@ -190,54 +180,27 @@ button{
 <div class="card-row">
 <h4>Card 1</h4>
 <div class="card-grid">
-  <div>
-    <label>Balance</label>
-    <input class="bal" value="5000">
-  </div>
-  <div>
-    <label>APR (%)</label>
-    <input class="apr" value="18.9">
-  </div>
-  <div>
-    <label>Minimum</label>
-    <input class="min" value="100">
-  </div>
+  <div><label>Balance</label><input class="bal" value="5000"></div>
+  <div><label>APR (%)</label><input class="apr" value="18.9"></div>
+  <div><label>Minimum</label><input class="min" value="100"></div>
 </div>
 </div>
 
 <div class="card-row">
 <h4>Card 2</h4>
 <div class="card-grid">
-  <div>
-    <label>Balance</label>
-    <input class="bal" value="3900">
-  </div>
-  <div>
-    <label>APR (%)</label>
-    <input class="apr" value="19.99">
-  </div>
-  <div>
-    <label>Minimum</label>
-    <input class="min" value="90">
-  </div>
+  <div><label>Balance</label><input class="bal" value="3900"></div>
+  <div><label>APR (%)</label><input class="apr" value="19.99"></div>
+  <div><label>Minimum</label><input class="min" value="90"></div>
 </div>
 </div>
 
 <div class="card-row">
 <h4>Card 3</h4>
 <div class="card-grid">
-  <div>
-    <label>Balance</label>
-    <input class="bal" value="6000">
-  </div>
-  <div>
-    <label>APR (%)</label>
-    <input class="apr" value="15.99">
-  </div>
-  <div>
-    <label>Minimum</label>
-    <input class="min" value="120">
-  </div>
+  <div><label>Balance</label><input class="bal" value="6000"></div>
+  <div><label>APR (%)</label><input class="apr" value="15.99"></div>
+  <div><label>Minimum</label><input class="min" value="120"></div>
 </div>
 </div>
 
@@ -260,9 +223,10 @@ button{
 <canvas id="chart"></canvas>
 </div>
 
-<h3 style="margin:12px 0">Amortization Schedule (All Cards Combined)</h3>
+<h3 style="margin:10px 0">Amortization Schedule (All Cards Combined)</h3>
 
 <div class="table-wrap">
+<div class="table-scroll">
 <table>
 <thead>
 <tr>
@@ -273,8 +237,9 @@ button{
 <th>Balance</th>
 </tr>
 </thead>
-<tbody class="table-body" id="table"></tbody>
+<tbody id="table"></tbody>
 </table>
+</div>
 </div>
 
 </div>
@@ -284,8 +249,7 @@ button{
 
 <script>
 let chart;
-
-function money(n){return "$"+n.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,",");}
+const money=n=>"$"+n.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,",");
 
 function calculate(){
 const budget=+document.getElementById("budget").value;
@@ -298,12 +262,13 @@ let cards=[...document.querySelectorAll(".card-row")].map(c=>({
 }));
 
 let month=0,totalInterest=0,totalPaid=0;
-let rows=[],balances=[];
+let balances=[],rows=[];
 
 while(cards.some(c=>c.bal>0) && month<600){
   month++;
   let paymentLeft=budget;
   let interestMonth=0;
+  let paymentThisMonth=0;
 
   cards.forEach(c=>{
     if(c.bal>0){
@@ -321,20 +286,22 @@ while(cards.some(c=>c.bal>0) && month<600){
       let pay=Math.min(Math.max(c.min,paymentLeft),c.bal);
       c.bal-=pay;
       paymentLeft-=pay;
+      paymentThisMonth+=pay;
       totalPaid+=pay;
     }
   });
 
   totalInterest+=interestMonth;
-  balances.push(cards.reduce((s,c)=>s+c.bal,0));
+  let totalBal=cards.reduce((s,c)=>s+c.bal,0);
+  balances.push(totalBal);
 
   rows.push(`
     <tr>
       <td>${month}</td>
-      <td>${money(budget)}</td>
+      <td>${money(paymentThisMonth)}</td>
       <td>${money(interestMonth)}</td>
-      <td>${money(budget-interestMonth)}</td>
-      <td>${money(balances.at(-1))}</td>
+      <td>${money(paymentThisMonth-interestMonth)}</td>
+      <td>${money(totalBal)}</td>
     </tr>
   `);
 }
